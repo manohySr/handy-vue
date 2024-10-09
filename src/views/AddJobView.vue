@@ -1,15 +1,93 @@
-<script setup></script>
+<script setup>
+import { reactive } from 'vue'
+import Toastify from 'toastify-js'
+import 'toastify-js/src/toastify.css'
+import { useRouter } from 'vue-router'
+
+const uri = import.meta.env.VITE_SERVER_URI
+const router = useRouter()
+const form = reactive({
+  type: 'Full-Time',
+  title: '',
+  description: '',
+  salary: '',
+  location: '',
+  company: {
+    name: '',
+    description: '',
+    contactEmail: '',
+    contactPhone: ''
+  }
+})
+
+const handleSubmit = async () => {
+  const newJob = {
+    title: form.title,
+    type: form.type,
+    location: form.location,
+    description: form.description,
+    salary: form.salary,
+    company: {
+      name: form.company.name,
+      description: form.company.description,
+      contactEmail: form.company.contactEmail,
+      contactPhone: form.company.contactPhone
+    }
+  }
+
+  try {
+    const result = await fetch(uri, {
+      method: 'POST',
+      body: JSON.stringify(newJob)
+    })
+
+    if (!result.ok) {
+      throw new Error('Error while deleting')
+    }
+
+    const data = await result.json()
+    console.log(data)
+
+    Toastify({
+      text: 'Job Added Successfully',
+      duration: 3000, // 3 seconds
+      close: true,
+      gravity: 'top', // `top` or `bottom`
+      position: 'right', // `left`, `center` or `right`
+      backgroundColor: '#4CAF50' // Green for success
+    }).showToast()
+
+    router.push('/jobs/' + data.id)
+  } catch (error) {
+    console.error('Error adding job:', error)
+    Toastify({
+      text: 'Job Not Added',
+      duration: 3000,
+      close: true,
+      gravity: 'top',
+      position: 'right',
+      backgroundColor: '#FF0000' // Red for error
+    }).showToast()
+  }
+}
+</script>
 
 <template>
   <section class="bg-green-50">
     <div class="container m-auto max-w-2xl py-24">
       <div class="bg-white px-6 py-8 mb-4 shadow-md rounded-md border m-4 md:m-0">
-        <form>
+        <form @submit.prevent="handleSubmit">
           <h2 class="text-3xl text-center font-semibold mb-6">Add Job</h2>
 
           <div class="mb-4">
             <label for="type" class="block text-gray-700 font-bold mb-2">Job Type</label>
-            <select id="type" name="type" class="border rounded w-full py-2 px-3" required>
+            <select
+              v-model="form.type"
+              id="type"
+              name="type"
+              class="border rounded w-full py-2 px-3"
+              required
+            >
               <option value="Full-Time">Full-Time</option>
               <option value="Part-Time">Part-Time</option>
               <option value="Remote">Remote</option>
@@ -21,6 +99,7 @@
             <label class="block text-gray-700 font-bold mb-2">Job Listing Name</label>
             <input
               type="text"
+              v-model="form.title"
               id="name"
               name="name"
               class="border rounded w-full py-2 px-3 mb-2"
@@ -32,6 +111,7 @@
             <label for="description" class="block text-gray-700 font-bold mb-2">Description</label>
             <textarea
               id="description"
+              v-model="form.description"
               name="description"
               class="border rounded w-full py-2 px-3"
               rows="4"
@@ -41,7 +121,13 @@
 
           <div class="mb-4">
             <label for="type" class="block text-gray-700 font-bold mb-2">Salary</label>
-            <select id="salary" name="salary" class="border rounded w-full py-2 px-3" required>
+            <select
+              id="salary"
+              v-model="form.salary"
+              name="salary"
+              class="border rounded w-full py-2 px-3"
+              required
+            >
               <option value="Under $50K">under $50K</option>
               <option value="$50K - $60K">$50 - $60K</option>
               <option value="$60K - $70K">$60 - $70K</option>
@@ -60,6 +146,7 @@
             <label class="block text-gray-700 font-bold mb-2"> Location </label>
             <input
               type="text"
+              v-model="form.location"
               id="location"
               name="location"
               class="border rounded w-full py-2 px-3 mb-2"
@@ -74,6 +161,7 @@
             <label for="company" class="block text-gray-700 font-bold mb-2">Company Name</label>
             <input
               type="text"
+              v-model="form.company.name"
               id="company"
               name="company"
               class="border rounded w-full py-2 px-3"
@@ -87,6 +175,7 @@
             >
             <textarea
               id="company_description"
+              v-model="form.company.description"
               name="company_description"
               class="border rounded w-full py-2 px-3"
               rows="4"
@@ -100,6 +189,7 @@
             >
             <input
               type="email"
+              v-model="form.company.contactEmail"
               id="contact_email"
               name="contact_email"
               class="border rounded w-full py-2 px-3"
@@ -113,6 +203,7 @@
             >
             <input
               type="tel"
+              v-model="form.company.contactPhone"
               id="contact_phone"
               name="contact_phone"
               class="border rounded w-full py-2 px-3"
