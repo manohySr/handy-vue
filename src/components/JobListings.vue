@@ -3,7 +3,6 @@ import { reactive, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import Joblisting from '@/components/Joblisting.vue'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
-import uri from '@/env'
 
 defineProps({
   limit: Number,
@@ -13,6 +12,7 @@ defineProps({
   }
 })
 
+const uri = import.meta.env.VITE_SERVER_URI
 const state = reactive({
   jobs: [],
   isLoading: false

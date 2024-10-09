@@ -1,11 +1,12 @@
 <script setup>
 import { reactive, onMounted } from 'vue'
 import { useRoute, RouterLink, useRouter } from 'vue-router'
-import uri from '@/env'
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import BackButton from '@/components/BackButton.vue'
 import Toastify from 'toastify-js'
 import 'toastify-js/src/toastify.css'
+
+const uri = import.meta.env.VITE_SERVER_URI
 
 const route = useRoute()
 const router = useRouter()
